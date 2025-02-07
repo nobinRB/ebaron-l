@@ -2,17 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
 
-interface RouteParams {
-  id: string;
-}
-
 export async function GET(
-  request: NextRequest,
-  { params }: { params: RouteParams }
+  _req: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectToDatabase();
-
+    
     const productId = params.id;
     
     // Find the product by ID

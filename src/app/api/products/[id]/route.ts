@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
-// @ts-ignore
+
+// @ts-expect-error Server Component
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }

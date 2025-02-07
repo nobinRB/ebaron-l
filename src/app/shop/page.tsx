@@ -8,7 +8,7 @@ import { Grid2X2, Grid3X3, LayoutGrid, ChevronDown } from 'lucide-react';
 type GridLayout = '2' | '3' | '4';
 type SortOption = 'newest' | 'price-low-high' | 'price-high-low' | 'name';
 
-export default function ShopPage() {
+function ShopContent() {
   const [layout, setLayout] = useState<GridLayout>('4');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
 
@@ -82,5 +82,17 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading shop...</div>
+      </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 }

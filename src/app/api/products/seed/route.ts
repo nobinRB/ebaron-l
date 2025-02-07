@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 const sampleProducts = [
@@ -193,7 +193,7 @@ export async function GET() {
   try {
     console.log('Starting seed process...');
     
-    const mongoose = await connectDB();
+    const mongoose = await connectToDatabase();
     if (!mongoose) {
       console.error('Database connection failed');
       return NextResponse.json(

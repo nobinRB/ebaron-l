@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiMenu, FiX, FiChevronDown, FiBox, FiMail, FiShoppingCart, FiUsers, FiSettings, 
-  FiHelpCircle, FiPhoneCall, FiLogOut, FiPackage, FiBarChart2, FiStar, FiList, 
-  FiDatabase, FiGrid, FiImage, FiMaximize2, FiRefreshCw, FiPieChart, FiTrendingUp, 
-  FiDollarSign, FiPercent, FiEye, FiGlobe, FiEdit, FiBell } from 'react-icons/fi';
+  FiHelpCircle, FiPhoneCall, FiLogOut, FiPackage, FiBarChart2, FiStar, FiBell } from 'react-icons/fi';
 import { removeAuthToken, redirectToLogin } from '@/utils/auth';
 import { getAuthToken } from '@/utils/auth';  // Add this import
 

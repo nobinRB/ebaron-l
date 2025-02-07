@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
 
 export async function GET() {
   try {
-    const mongoose = await connectDB();
+    const mongoose = await connectToDatabase();
     if (!mongoose) {
       throw new Error('Failed to connect to database');
     }

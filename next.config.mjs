@@ -9,6 +9,9 @@ const nextConfig = {
       // Add other image domains as needed
     ],
   },
+  experimental: {
+    appDir: true
+  }
 };
 
 export default nextConfig;

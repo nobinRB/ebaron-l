@@ -5,12 +5,13 @@ import { useSearchParams } from 'next/navigation';
 import ProductGrid from '@/components/products/ProductGrid';
 import FilterSidebar from '@/components/filters/FilterSidebar';
 import { Product } from '@/types/product';
+import { IProduct } from '@/models/Product'; // Add this import
 import { Grid2X2, Grid3X3, LayoutGrid, ChevronDown } from 'lucide-react';
 
 type GridLayout = '2' | '3' | '4';
 type SortOption = 'newest' | 'price-low-high' | 'price-high-low' | 'name';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
   const [layout, setLayout] = useState<GridLayout>('4');
@@ -77,7 +78,6 @@ export default function SearchPage() {
             <aside className="w-full md:w-1/6">
               <FilterSidebar />
             </aside>
-            
             <div className="w-full md:w-5/6">
               <Suspense fallback={<div>Loading search results...</div>}>
                 <SearchResults query={query} layout={layout} sortBy={sortBy} />
@@ -91,59 +91,62 @@ export default function SearchPage() {
 }
 
 function SearchResults({ query, layout, sortBy }: { query: string | null, layout: GridLayout, sortBy: SortOption }) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (query) {
-        try {
-          setLoading(true);
-          const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
-          
-          if (!response.ok) {
-            throw new Error('Failed to fetch search results');
-          }
-          
-          const data = await response.json();
-          // Transform the data to ensure it matches the Product type
-          const transformedProducts = data.map((item: any) => new Product({
-            _id: item._id.toString(),
-            name: item.name || '',
-            description: item.description || '',
-            price: Number(item.price) || 0,
-            originalPrice: Number(item.originalPrice) || 0,
-            stock: Number(item.stock) || 0,
-            category: item.category || '',
-            subcategory: item.subcategory,
-            imageUrl: item.imageUrl || '',
-            images: item.images || undefined,
-            variants: {
-              colors: Array.isArray(item.variants?.colors) ? item.variants.colors : [],
-              sizes: Array.isArray(item.variants?.sizes) ? item.variants.sizes : []
-            },
-            ratings: Array.isArray(item.ratings) ? item.ratings : [],
-            reviews: Array.isArray(item.reviews) ? item.reviews : []
-          }));
-          
-          setProducts(transformedProducts);
-          setError(null);
-        } catch (error) {
-          console.error('Error fetching search results:', error);
-          setError(error instanceof Error ? error.message : 'An unknown error occurred');
-          setProducts([]);
-        } finally {
-          setLoading(false);
+      try {
+        setLoading(true);
+        // Always fetch products even if query is empty
+        const response = await fetch(`/api/products/search${query ? `?q=${encodeURIComponent(query)}` : ''}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch search results');
         }
-      } else {
+        
+        const data = await response.json();
+        const transformedProducts = data.map((item: any) => ({
+          _id: item._id.toString(),
+          name: item.name || '',
+          description: item.description || '',
+          price: Number(item.price) || 0,
+          originalPrice: Number(item.originalPrice) || 0,
+          stock: Number(item.stock) || 0,
+          category: item.category || '',
+          subcategory: item.subcategory || '',
+          // Ensure image URLs are absolute
+          imageUrl: item.images?.[0]?.startsWith('http') 
+            ? item.images[0] 
+            : item.imageUrl?.startsWith('http')
+              ? item.imageUrl
+              : '/placeholder.jpg',
+          images: Array.isArray(item.images) && item.images.length > 0
+            ? item.images.map((img: string) => img.startsWith('http') ? img : `/api/images/${img}`)
+            : ['/placeholder.jpg'],
+          variants: {
+            colors: Array.isArray(item.variants?.colors) ? item.variants.colors : [],
+            sizes: Array.isArray(item.variants?.sizes) ? item.variants.sizes : []
+          },
+          ratings: Array.isArray(item.ratings) ? item.ratings : [],
+          reviews: Array.isArray(item.reviews) ? item.reviews : []
+        }));
+        
+        console.log('Transformed products:', transformedProducts); // Debug log
+        setProducts(transformedProducts);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setError(error instanceof Error ? error.message : 'An unknown error occurred');
         setProducts([]);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchSearchResults();
-  }, [query]);
+  }, [query]); // Only depend on query parameter
 
   if (loading) {
     return (
@@ -175,7 +178,11 @@ function SearchResults({ query, layout, sortBy }: { query: string | null, layout
   return (
     <div className="rounded-lg">
       {products.length > 0 ? (
-        <ProductGrid products={products} layout={layout} sortBy={sortBy} />
+        <ProductGrid
+          products={products} // No need for mapping since we're already using IProduct[]
+          layout={layout}
+          sortBy={sortBy}
+        />
       ) : (
         <div>
           <p className="text-xl text-gray-600 mb-4">
@@ -187,5 +194,19 @@ function SearchResults({ query, layout, sortBy }: { query: string | null, layout
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-gray-200 to-gray-300">
+          <div className="container mx-auto px-4 py-32">Loading...</div>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }

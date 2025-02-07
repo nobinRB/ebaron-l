@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
 
+type Props = {
+  params: {
+    id: string
+  }
+}
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: Props
 ) {
   try {
     await connectToDatabase();
 
-    const productId = context.params.id;
+    const productId = params.id;
 
     // Find the product by ID
     const product = await Product.findById(productId).lean().exec();

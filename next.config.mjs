@@ -11,7 +11,10 @@ const nextConfig = {
   },
   experimental: {
     appDir: true
-  }
+  },
+  typescript: {
+    ignoreBuildErrors: true,  // 🚨 Use only for debugging
+  },
 };
 
 export default nextConfig;

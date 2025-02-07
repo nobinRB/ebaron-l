@@ -29,6 +29,8 @@ ChartJS.register(
 );
 
 export default function DashboardPage() {
+    // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {

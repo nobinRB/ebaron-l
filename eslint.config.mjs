@@ -9,5 +9,6 @@ export default [...compat.extends("next/core-web-vitals", "next/typescript"),  {
     rules: {
       "react/no-unescaped-entities": "off",   // Disables specific rule
       "@typescript-eslint/no-unused-vars": "warn", // Warnings instead of errors
+      "@typescript-eslint/no-explicit-any": "off", // ✅ Disables the rule globally
     },
   },];

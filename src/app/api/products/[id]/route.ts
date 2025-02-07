@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import Product from '@/models/Product';
-// @ts-expect-error Server Component
+
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> {
+  request: NextRequest,
+  context: Context
+): Promise<Response> {
   try {
     await connectToDatabase();
     
-    const productId = params.id;
+    const productId = context.params.id;
     
     // Find the product by ID
     const product = await Product.findById(productId).lean().exec();

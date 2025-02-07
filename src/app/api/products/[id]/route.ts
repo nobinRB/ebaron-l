@@ -10,13 +10,11 @@ interface Params {
 
 export async function GET(
   request: NextRequest,
-  { params }: Params
+  { params }: { params: Params }
 ) {
   try {
     await connectToDatabase();
-
-    const productId = params.id;
-
+    const productId = params.params.id;
     // Find the product by ID
     const product = await Product.findById(productId).lean().exec();
 
